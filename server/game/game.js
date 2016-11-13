@@ -504,7 +504,7 @@ class Game extends EventEmitter {
     }
 
     handleClaim(player, otherPlayer, card) {
-        if(card.type_code !== 'character') {
+        if(card.getType() !== 'character') {
             return;
         }
 
@@ -528,19 +528,19 @@ class Game extends EventEmitter {
         }
     }
 
-    processCardClicked(player, card) {
+    processCardClicked(player, cardId) {
         var otherPlayer = this.getOtherPlayer(player);
 
         if(!_.isUndefined(player.setPower)) {
-            var cardInPlay = player.findCardInPlayByUuid(card.uuid);
+            var card = player.findCardInPlayByUuid(cardId);
 
-            if(!cardInPlay) {
+            if(!card) {
                 return false;
             }
 
-            cardInPlay.power = player.setPower;
+            card.power = player.setPower;
 
-            this.addMessage(player.name + ' uses the /power command to set the power of ' + cardInPlay.label + ' to ' + player.setPower);
+            this.addMessage(player.name + ' uses the /power command to set the power of ' + card.label + ' to ' + player.setPower);
             this.doneSetPower(player.id);
 
             return true;
@@ -572,24 +572,24 @@ class Game extends EventEmitter {
             return true;
         }
 
-        if(player.phase !== 'setup' || card.type_code !== 'attachment') {
+        if(player.phase !== 'setup' || card.getType() !== 'attachment') {
             return false;
         }
 
-        player.promptForAttachment(card);
+        player.promptForAttachment(cardId);
 
         return true;
     }
 
-    cardClicked(sourcePlayer, card) {
+    cardClicked(sourcePlayer, cardId) {
         var player = this.getPlayers()[sourcePlayer];
 
         if(!player) {
             return;
         }
 
-        if(!this.processCardClicked(player, card)) {
-            var cardInPlay = player.findCardInPlayByUuid(card.uuid);
+        if(!this.processCardClicked(player, cardId)) {
+            var cardInPlay = player.findCardInPlayByUuid(cardId);
 
             if(cardInPlay) {
                 cardInPlay.kneeled = !cardInPlay.kneeled;
@@ -615,14 +615,14 @@ class Game extends EventEmitter {
         }
     }
 
-    drop(playerId, card, source, target) {
+    drop(playerId, cardId, source, target) {
         var player = this.getPlayerById(playerId);
 
         if(!player) {
             return;
         }
 
-        if(player.drop(card, source, target)) {
+        if(player.drop(cardId, source, target)) {
             this.addMessage(player.name + ' has moved a card from their ' + source + ' to their ' + target);
         }
     }

@@ -41,9 +41,7 @@ class Player extends Spectator {
     }
 
     moveFromDrawDeckToHand(card) {
-        this.drawDeck = _(this.drawDeck.reject(c => {
-            return c.uuid === card.uuid;
-        }));
+        this.drawDeck = this.removeCardByUuid(this.drawDeck, card.uuid);
 
         this.hand.push(card);
     }
@@ -177,9 +175,7 @@ class Player extends Spectator {
     }
 
     removeFromHand(card) {
-        this.hand = _(this.hand.reject(handCard => {
-            return handCard.uuid === card.uuid;
-        }));
+        this.hand = this.removeCardByUuid(this.hand, card.uuid);
     }
 
     discardFromDraw(number) {
@@ -206,7 +202,7 @@ class Player extends Spectator {
         if(!dupeCard && !forcePlay) {
             this.gold -= card.getCost();
         }
-        
+
         if(card.getType() === 'attachment' && this.phase !== 'setup') {
             this.promptForAttachment(card);
             return true;
@@ -319,9 +315,7 @@ class Player extends Spectator {
         }
 
         this.activePlot = this.selectedPlot;
-        this.plotDeck = _(this.plotDeck.reject, card => {
-            return card.uuid === this.selectedPlot.uuid;
-        });
+        this.plotDeck = this.removeCardByUuid(this.plotDeck, this.selectedPlot.uuid);
 
         if(this.plotDeck.empty() === 0) {
             this.plotDeck = this.plotDiscard;
@@ -427,14 +421,14 @@ class Player extends Spectator {
         }
     }
 
-    drop(card, source, target) {
+    drop(cardId, source, target) {
         if(!this.isValidDropCombination(source, target)) {
             return false;
         }
 
         var sourceList = this.getSourceList(source);
-        var sourceCard = this.findCardByUuid(sourceList, card.uuid);
-        if(!sourceCard) {
+        var card = this.findCardByUuid(sourceList, cardId);
+        if(!card) {
             return false;
         }
 
@@ -444,7 +438,7 @@ class Player extends Spectator {
                 break;
             case 'discard pile':
                 if(source === 'play area') {
-                    this.discardCard(card, this.discardPile);
+                    this.discardCard(cardId, this.discardPile);
 
                     return true;
                 }
@@ -458,7 +452,7 @@ class Player extends Spectator {
                 }
 
                 if(source === 'play area') {
-                    this.discardCard(card, this.deadPile);
+                    this.discardCard(cardId, this.deadPile);
 
                     return true;
                 }
@@ -470,7 +464,7 @@ class Player extends Spectator {
                     return false;
                 }
 
-                this.game.playCard(this.id, card, true);
+                this.game.playCard(this.id, cardId, true);
 
                 if(card.getType() === 'attachment') {
                     this.dropPending = true;
@@ -478,19 +472,15 @@ class Player extends Spectator {
                 }
                 break;
             case 'draw deck':
-                this.drawDeck.unshift(sourceCard);
+                this.drawDeck.unshift(card);
                 break;
         }
 
-        if(sourceCard.parent && sourceCard.parent.attachments) {
-            sourceCard.parent.attachments = _.reject(sourceCard.parent.attachments, a => {
-                return a.uuid === card.uuid;
-            });
+        if(card.parent && card.parent.attachments) {
+            card.parent.attachments = this.removeCardByUuid(card.parent.attachments, cardId);
         }
 
-        sourceList = _.reject(sourceList, c => {
-            return c.uuid === card.uuid;
-        });
+        sourceList = this.removeCardByUuid(sourceList, cardId);
 
         this.updateSourceList(source, sourceList);
 
@@ -594,9 +584,7 @@ class Player extends Spectator {
         if(card.selected) {
             this.cardsInChallenge.push(card);
         } else {
-            this.cardsInChallenge = _.reject(this.cardsInChallenge, c => {
-                return c.uuid === card.uuid;
-            });
+            this.cardsInChallenge = this.removeCardByUuid(this.cardsInChallenge, card.uuid);
         }
     }
 
@@ -657,9 +645,7 @@ class Player extends Spectator {
             character.dupes = character.dupes.slice(1);
             character = undefined;
         } else {
-            this.cardsInPlay = _(this.cardsInPlay.reject(c => {
-                return c.uuid === card.uuid;
-            }));
+            this.cardsInPlay = this.removeCardByUuid(this.cardsInPlay, card.uuid);
 
             this.deadPile.push(card);
         }
@@ -731,33 +717,29 @@ class Player extends Spectator {
         return card.text.indexOf(keyword + '.') !== -1;
     }
 
-    discardCard(card, pile) {
-        var cardInPlay = this.findCardInPlayByUuid(card.uuid);
+    discardCard(cardId, pile) {
+        var card = this.findCardInPlayByUuid(cardId);
 
-        if(!cardInPlay) {
+        if(!card) {
             return;
         }
 
-        _.each(cardInPlay.dupes, dupe => {
+        _.each(card.dupes, dupe => {
             pile.push(dupe);
         });
 
-        cardInPlay.dupes = [];
+        card.dupes = [];
 
-        _.each(cardInPlay.attachments, attachment => {
-            this.removeAttachment(cardInPlay, attachment);
+        _.each(card.attachments, attachment => {
+            this.removeAttachment(card, attachment);
         });
 
-        this.cardsInPlay = _(this.cardsInPlay.reject(c => {
-            return c.uuid === card.uuid;
-        }));
+        this.cardsInPlay = this.removeCardByUuid(this.cardsInPlay, cardId);
 
-        if(cardInPlay.parent && cardInPlay.parent.attachments) {
-            cardInPlay.parent.attachments = _.reject(cardInPlay.parent.attachments, attachment => {
-                return attachment.uuid === cardInPlay.uuid;
-            });
+        if(card.parent && card.parent.attachments) {
+            card.parent.attachments = this.removeCardByUuid(card.parent.attachments, cardId);
 
-            this.game.notifyLeavingPlay(this, cardInPlay);
+            this.game.notifyLeavingPlay(this, card);
         }
 
         pile.push(card);
@@ -802,6 +784,12 @@ class Player extends Spectator {
         return this.cardsInPlay.find(card => {
             return card.code === code;
         });
+    }
+
+    removeCardByUuid(list, uuid) {
+        return _(list.reject(card => {
+            return card.uuid === uuid;
+        }));
     }
 
     findCardByUuid(list, uuid) {
@@ -898,10 +886,6 @@ class Player extends Spectator {
     }
 
     getState(isActivePlayer) {
-        var cardsInPlay = _(this.cardsInPlay.map(card => {
-            return card.getSummary(isActivePlayer);
-        }));
-
         var state = {
             id: this.id,
             faction: this.deck.faction,
@@ -918,7 +902,9 @@ class Player extends Spectator {
             reserve: this.reserve,
             claim: this.claim,
             phase: this.phase,
-            cardsInPlay: cardsInPlay,
+            cardsInPlay: this.cardsInPlay.map(card => {
+                return card.getSummary(true);
+            }),
             plotDeck: isActivePlayer ? this.plotDeck : undefined,
             numPlotCards: this.plotDeck.size(),
             plotSelected: !!this.selectedPlot,
@@ -927,13 +913,19 @@ class Player extends Spectator {
             plotDiscard: this.plotDiscard,
             selectedAttachment: this.selectedAttachment,
             selectCard: this.selectCard,
-            deadPile: this.deadPile,
-            discardPile: this.discardPile
+            deadPile: this.deadPile.map(card => {
+                return card.getSummary(isActivePlayer);
+            }),
+            discardPile: this.discardPile.map(card => {
+                return card.getSummary(true);
+            })
         };
 
         if(this.showDeck) {
             state.showDeck = true;
-            state.drawDeck = this.drawDeck;
+            state.drawDeck = this.drawDeck.map(card => {
+                return card.getSummary(isActivePlayer);
+            });
         }
 
         return state;

@@ -100,7 +100,7 @@ export class InnerGameBoard extends React.Component {
     }
 
     onInPlayCardClick(card) {
-        this.props.socket.emit('cardclick', card);
+        this.props.socket.emit('cardclick', card.uuid);
     }
 
     onDrawClick() {
@@ -157,7 +157,7 @@ export class InnerGameBoard extends React.Component {
     }
 
     onDragDrop(card, source, target) {
-        this.props.socket.emit('drop', card, source, target);
+        this.props.socket.emit('drop', card.uuid, source, target);
     }
 
     onCardDragStart(event, card, source) {

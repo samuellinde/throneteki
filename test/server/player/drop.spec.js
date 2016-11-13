@@ -4,20 +4,6 @@
 const Player = require('../../../server/game/player.js');
 
 describe('Player', () => {
-    // var 
-    // var otherPlayer = new Player('2', 'Player 2', false, this.game);
-    // var attachment = { card: { uuid: '1111', code: '1', label: 'Attachment', type_code: 'attachment', owner: player.id } };
-    // var cardWithNoAttachments = { attachments: [], dupes: [], card: { uuid: '2222', code: '2', label: 'Character', type_code: 'character', is_unique: true } };
-    // var cardWithAttachment = { attachments: [attachment.card], card: { uuid: '3333', code: '3', label: 'Character', type_code: 'character' } };
-    // var characterInHand = { uuid: '4444', code: '4', label: 'Hand', type_code: 'character' };
-    // var locationInHand = { uuid: '5555', code: '5', label: 'Hand Location', type_code: 'location' };
-    // var attachmentInHand = { uuid: '7777', code: '7', label: 'Hand Attachment', type_code: 'attachment', text: 'Terminal. Some other Stuff.', owner: player.id };
-    // var eventInHand = { uuid: '8888', code: '8', label: 'Hand Event', type_code: 'event' };
-    // var cardNotInHand = { uuid: '6666', code: '6', label: 'NotInHand', type_code: 'character' };
-    // var dupe = { card: { uuid: '2222dupe', code: '2', label: 'Hand', type_code: 'character', is_unique: true } };
-    // var otherPlayerNonTerminalAttachment = { card: { uuid: '9999', code: '9', label: 'Attachment', type_code: 'attachment', owner: otherPlayer.id } };
-    // var otherPlayerTerminalAttachment = { card: { uuid: '1212', code: '12', label: 'Attachment', type_code: 'attachment', text: 'Terminal.', owner: otherPlayer.id } };
-
     describe('drop()', function() {
         beforeEach(function() {
             this.gameSpy = jasmine.createSpyObj('game', ['playCard']);
