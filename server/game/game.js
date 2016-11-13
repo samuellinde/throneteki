@@ -257,7 +257,7 @@ class Game extends EventEmitter {
             return;
         }
 
-        var plotImplementation = cards[player.selectedPlot.card.code];
+        var plotImplementation = cards[player.selectedPlot.code];
         if(plotImplementation && plotImplementation.register) {
             plotImplementation.register(this, player);
         }
@@ -436,7 +436,7 @@ class Game extends EventEmitter {
         if(targetPlayer === player && player.phase === 'setup') {
             // We put attachments on the board during setup, now remove it
             player.cardsInPlay = _.reject(player.cardsInPlay, c => {
-                return c.card.uuid === player.selectedAttachment.uuid;
+                return c.uuid === player.selectedAttachment.uuid;
             });
         }
 
@@ -475,7 +475,7 @@ class Game extends EventEmitter {
                     return false;
                 }
 
-                this.addMessage(player.name + ' has chosen ' + otherCardInPlay.card.label + ' as a stealth target');
+                this.addMessage(player.name + ' has chosen ' + otherCardInPlay.label + ' as a stealth target');
                 player.stealthCard.stealthTarget = otherCardInPlay;
 
                 if(this.doStealth(player)) {
@@ -540,7 +540,7 @@ class Game extends EventEmitter {
 
             cardInPlay.power = player.setPower;
 
-            this.addMessage(player.name + ' uses the /power command to set the power of ' + cardInPlay.card.label + ' to ' + player.setPower);
+            this.addMessage(player.name + ' uses the /power command to set the power of ' + cardInPlay.label + ' to ' + player.setPower);
             this.doneSetPower(player.id);
 
             return true;
@@ -694,7 +694,7 @@ class Game extends EventEmitter {
         });
 
         if(stealthCard) {
-            player.menuTitle = 'Select stealth target for ' + stealthCard.card.label;
+            player.menuTitle = 'Select stealth target for ' + stealthCard.label;
             player.buttons = [
                 { command: 'donestealth', text: 'Done' }
             ];
@@ -822,7 +822,7 @@ class Game extends EventEmitter {
             if(this.hasKeyword(card.card, 'Insight')) {
                 winner.drawCardsToHand(1);
 
-                this.addMessage(winner.name + ' draws a card from Insight on ' + card.card.label);
+                this.addMessage(winner.name + ' draws a card from Insight on ' + card.label);
             }
 
             if(this.hasKeyword(card.card, 'Intimidate')) {
@@ -832,13 +832,13 @@ class Game extends EventEmitter {
             if(this.hasKeyword(card.card, 'Pillage')) {
                 loser.discardFromDraw(1);
 
-                this.addMessage(loser.name + ' discards a card from the top of their deck from Pillage on ' + card.card.label);
+                this.addMessage(loser.name + ' discards a card from the top of their deck from Pillage on ' + card.label);
             }
 
             if(this.hasKeyword(card.card, 'Renown')) {
                 card.power++;
 
-                this.addMessage(winner.name + ' gains 1 power on ' + card.card.label + ' from Renown');
+                this.addMessage(winner.name + ' gains 1 power on ' + card.label + ' from Renown');
             }
 
             this.checkWinCondition(winner);
@@ -847,7 +847,7 @@ class Game extends EventEmitter {
 
     applyClaim(winner, loser) {
         this.emit('beforeClaim', this, winner.currentChallenge, winner, loser);
-        var claim = winner.activePlot.card.claim;
+        var claim = winner.activePlot.claim;
 
         if(claim <= 0) {
             this.addMessage('The claim value for ' + winner.currentChallenge + ' is 0, no claim occurs');
@@ -959,7 +959,7 @@ class Game extends EventEmitter {
         if(!otherPlayer) {
             player.startPlotPhase();
 
-            var plotImplementation = cards[player.activePlot.card.code];
+            var plotImplementation = cards[player.activePlot.code];
             if(plotImplementation && plotImplementation.unregister) {
                 plotImplementation.unregister(this, player);
             }
@@ -971,12 +971,12 @@ class Game extends EventEmitter {
             player.startPlotPhase();
             otherPlayer.startPlotPhase();
 
-            plotImplementation = cards[player.activePlot.card.code];
+            plotImplementation = cards[player.activePlot.code];
             if(plotImplementation && plotImplementation.unregister) {
                 plotImplementation.unregister(this, player);
             }
 
-            plotImplementation = cards[otherPlayer.activePlot.card.code];
+            plotImplementation = cards[otherPlayer.activePlot.code];
             if(plotImplementation && plotImplementation.unregister) {
                 plotImplementation.unregister(this, otherPlayer);
             }

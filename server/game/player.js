@@ -20,7 +20,7 @@ class Player extends Spectator {
     }
 
     drawCardsToHand(numCards) {
-        this.hand = _(this.hand.concat(_.first(this.drawDeck, numCards)));
+        this.hand = _(this.hand.concat(this.drawDeck.first(numCards)));
         this.drawDeck = _(this.drawDeck.rest(numCards));
     }
 
@@ -31,13 +31,13 @@ class Player extends Spectator {
             predicate = limit;
         } else {
             if(limit > 0) {
-                cards = _.first(this.drawDeck, limit);
+                cards = _(this.drawDeck.first(limit));
             } else {
-                cards = _.last(this.drawDeck, -limit);
+                cards = _(this.drawDeck.first(-limit));
             }
         }
 
-        return _.filter(cards, predicate);
+        return cards.filter(predicate);
     }
 
     moveFromDrawDeckToHand(card) {
@@ -46,12 +46,6 @@ class Player extends Spectator {
         }));
 
         this.hand.push(card);
-    }
-
-    findDrawDeckCardByUuid(uuid) {
-        return _.find(this.drawDeck, c => {
-            return c.uuid === uuid;
-        });
     }
 
     shuffleDrawDeck() {
@@ -162,7 +156,7 @@ class Player extends Spectator {
         }
 
         if(card.getType() === 'character' && card.isUnique) {
-            if(_.any(this.deadPile, c => {
+            if(this.deadPile.any(c => {
                 return c.code === card.code;
             })) {
                 return false;
@@ -190,7 +184,7 @@ class Player extends Spectator {
 
     discardFromDraw(number) {
         for(var i = 0; i < number; i++) {
-            this.discardPile.push(_.first(this.drawDeck));
+            this.discardPile.push(this.drawDeck.first());
             this.drawDeck = _(this.drawDeck.slice(1));
         }
     }
@@ -240,7 +234,7 @@ class Player extends Spectator {
     }
 
     postSetup() {
-        this.drawCardsToHand(7 - this.hand.length);
+        this.drawCardsToHand(7 - this.hand.size());
 
         var processedCards = [];
 
@@ -304,7 +298,7 @@ class Player extends Spectator {
     }
 
     selectPlot(plot) {
-        if(!_.any(this.plotDeck, card => {
+        if(!this.plotDeck.any(card => {
             return card.uuid === plot.uuid;
         })) {
             return false;
@@ -325,13 +319,13 @@ class Player extends Spectator {
         }
 
         this.activePlot = this.selectedPlot;
-        this.plotDeck = _.reject(this.plotDeck, card => {
+        this.plotDeck = _(this.plotDeck.reject, card => {
             return card.uuid === this.selectedPlot.uuid;
         });
 
-        if(this.plotDeck.length === 0) {
+        if(this.plotDeck.empty() === 0) {
             this.plotDeck = this.plotDiscard;
-            this.plotDiscard = [];
+            this.plotDiscard = _([]);
         }
 
         this.plotRevealed = true;
@@ -523,7 +517,7 @@ class Player extends Spectator {
         ];
 
         this.cardsInChallenge = [];
-        _.each(this.cardsInPlay, card => {
+        this.cardsInPlay.each(card => {
             card.stealth = undefined;
         });
         this.selectCard = false;
@@ -659,13 +653,13 @@ class Player extends Spectator {
             return undefined;
         }
 
-        if(character.dupes.length > 0) {
+        if(!character.dupes.empty() > 0) {
             character.dupes = character.dupes.slice(1);
             character = undefined;
         } else {
-            this.cardsInPlay = this.cardsInPlay.reject(c => {
+            this.cardsInPlay = _(this.cardsInPlay.reject(c => {
                 return c.uuid === card.uuid;
-            });
+            }));
 
             this.deadPile.push(card);
         }
@@ -687,7 +681,7 @@ class Player extends Spectator {
         var toDiscard = number;
 
         while(toDiscard > 0) {
-            var cardIndex = _.random(0, this.hand.length - 1);
+            var cardIndex = _.random(0, this.hand.size() - 1);
 
             var discarded = this.hand.splice(cardIndex, 1);
 
@@ -700,7 +694,7 @@ class Player extends Spectator {
     }
 
     getDominance() {
-        var cardStrength = _.reduce(this.cardsInPlay, (memo, card) => {
+        var cardStrength = this.cardsInPlay.reduce((memo, card) => {
             if(!card.kneeled && card.getType() === 'character') {
                 return memo + card.strength;
             }
@@ -712,7 +706,7 @@ class Player extends Spectator {
     }
 
     standCards() {
-        _.each(this.cardsInPlay, card => {
+        this.cardsInPlay.each(card => {
             card.kneeled = false;
         });
     }
@@ -722,7 +716,7 @@ class Player extends Spectator {
     }
 
     getTotalPower() {
-        var power = _.reduce(this.cardsInPlay, (memo, card) => {
+        var power = this.cardsInPlay.reduce((memo, card) => {
             return memo + card.power;
         }, this.power);
 
@@ -754,9 +748,9 @@ class Player extends Spectator {
             this.removeAttachment(cardInPlay, attachment);
         });
 
-        this.cardsInPlay = this.cardsInPlay.reject(c => {
+        this.cardsInPlay = _(this.cardsInPlay.reject(c => {
             return c.uuid === card.uuid;
-        });
+        }));
 
         if(cardInPlay.parent && cardInPlay.parent.attachments) {
             cardInPlay.parent.attachments = _.reject(cardInPlay.parent.attachments, attachment => {
@@ -805,7 +799,7 @@ class Player extends Spectator {
     }
 
     findCardInPlayByCode(code) {
-        return _.find(this.cardsInPlay, card => {
+        return this.cardsInPlay.find(card => {
             return card.code === code;
         });
     }
@@ -841,7 +835,7 @@ class Player extends Spectator {
 
     selectDeck(deck) {
         this.drawCards = _([]);
-        this.plotCards = [];
+        this.plotCards = _([]);
 
         _.each(deck.drawCards, cardEntry => {
             for(var i = 0; i < cardEntry.count; i++) {
@@ -904,15 +898,15 @@ class Player extends Spectator {
     }
 
     getState(isActivePlayer) {
-        var cardsInPlay = this.cardsInPlay.map(card => {
+        var cardsInPlay = _(this.cardsInPlay.map(card => {
             return card.getSummary(isActivePlayer);
-        });
+        }));
 
         var state = {
             id: this.id,
             faction: this.deck.faction,
             agenda: this.deck.agenda,
-            numDrawCards: this.drawDeck.length,
+            numDrawCards: this.drawDeck.size(),
             hand: this.hand.map(card => {
                 return card.getSummary(isActivePlayer);
             }),
@@ -926,7 +920,7 @@ class Player extends Spectator {
             phase: this.phase,
             cardsInPlay: cardsInPlay,
             plotDeck: isActivePlayer ? this.plotDeck : undefined,
-            numPlotCards: this.plotDeck.length,
+            numPlotCards: this.plotDeck.size(),
             plotSelected: !!this.selectedPlot,
             activePlot: this.activePlot,
             firstPlayer: this.firstPlayer,

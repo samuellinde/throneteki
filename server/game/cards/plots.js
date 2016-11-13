@@ -217,7 +217,7 @@ class BuildingOrders {
             game.playerRevealDone(player);
         }
 
-        var card = player.findDrawDeckCardByUuid(arg);
+        var card = player.findCardByUuid(player.drawDeck, arg);
 
         if(!card) {
             return;
@@ -913,7 +913,7 @@ class Summons {
             game.playerRevealDone(player);
         }
 
-        var card = player.findDrawDeckCardByUuid(arg);
+        var card = player.findCardByUuid(player.drawDeck, arg);
 
         if(!card) {
             return;

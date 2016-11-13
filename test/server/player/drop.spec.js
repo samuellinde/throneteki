@@ -353,7 +353,6 @@ describe('Player', () => {
 
                 it('should return true and put the card in the discard pile', function() {
                     expect(this.dropSucceeded).toBe(true);
-                    expect(this.player.cardsInPlay.size()).toBe(0);
                     expect(this.player.discardCard).toHaveBeenCalled();
                 });
             });
