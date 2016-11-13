@@ -3,7 +3,7 @@
 
 const Player = require('../../../server/game/player.js');
 
-xdescribe('Player', () => {
+describe('Player', () => {
     // var 
     // var otherPlayer = new Player('2', 'Player 2', false, this.game);
     // var attachment = { card: { uuid: '1111', code: '1', label: 'Attachment', type_code: 'attachment', owner: player.id } };
@@ -279,205 +279,82 @@ xdescribe('Player', () => {
 
             describe('when the card is in hand and is an attachment', function() {
                 beforeEach(function() {
-                    player.hand.push(attachmentInHand);
-                    dropSucceeded = player.drop(attachmentInHand, 'hand', 'draw deck');
+                    this.cardSpy.getType.and.returnValue('attachment');
+                    this.dropSucceeded = this.player.drop(this.cardSpy, 'hand', 'draw deck');
                 });
 
                 it('should return true and put the card in the draw deck', function() {
-                    expect(dropSucceeded).toBe(true);
-                    expect(player.hand.length).toBe(0);
-                    expect(player.drawDeck.length).toBe(1);
+                    expect(this.dropSucceeded).toBe(true);
+                    expect(this.player.drawDeck.size()).toBe(1);
                 });
             });
 
             describe('when the card is in hand and is an event', function() {
                 beforeEach(function() {
-                    player.hand.push(eventInHand);
-                    dropSucceeded = player.drop(eventInHand, 'hand', 'draw deck');
+                    this.cardSpy.getType.and.returnValue('event');
+                    this.dropSucceeded = this.player.drop(this.cardSpy, 'hand', 'draw deck');
                 });
 
                 it('should return true and put the card in the draw deck', function() {
-                    expect(dropSucceeded).toBe(true);
-                    expect(player.hand.length).toBe(0);
-                    expect(player.drawDeck.length).toBe(1);
+                    expect(this.dropSucceeded).toBe(true);
+                    expect(this.player.drawDeck.size()).toBe(1);
                 });
             });
 
             describe('when the card is in hand and is a character', function() {
                 beforeEach(function() {
-                    player.hand.push(characterInHand);
-                    dropSucceeded = player.drop(characterInHand, 'hand', 'draw deck');
+                    this.cardSpy.getType.and.returnValue('character');
+                    this.dropSucceeded = this.player.drop(this.cardSpy, 'hand', 'draw deck');
                 });
 
                 it('should return true and put the card in the draw deck', function() {
-                    expect(dropSucceeded).toBe(true);
-                    expect(player.hand.length).toBe(0);
-                    expect(player.drawDeck.length).toBe(1);
+                    expect(this.dropSucceeded).toBe(true);
+                    expect(this.player.drawDeck.size()).toBe(1);
                 });
             });
 
             describe('when two cards are dragged to the draw deck', function() {
                 beforeEach(function() {
-                    player.hand.push(characterInHand);
-                    player.hand.push(locationInHand);
-
-                    dropSucceeded = player.drop(characterInHand, 'hand', 'draw deck');
-                    dropSucceeded = player.drop(locationInHand, 'hand', 'draw deck');
+                    this.player.drop(this.cardSpy, 'hand', 'draw deck');
+                    this.dropSucceeded = this.player.drop(this.cardSpy, 'hand', 'draw deck');
                 });
 
                 it('should put the cards in the draw deck in the correct order', function() {
-                    expect(dropSucceeded).toBe(true);
-                    expect(player.hand.length).toBe(0);
-                    expect(player.drawDeck[0].code).toBe(locationInHand.code);
-                    expect(player.drawDeck[1].code).toBe(characterInHand.code);
+                    expect(this.dropSucceeded).toBe(true);
+//                    expect(this.player.drawDeck[0].code).toBe(locationInHand.code);
+  //                  expect(this.player.drawDeck[1].code).toBe(characterInHand.code);
                 });
             });
         });
 
         describe('when dragging a card from the play area to the discard pile', function() {
+            beforeEach(function() {
+                this.player.cardsInPlay.push(this.cardSpy);
+            });
+
             describe('when the card is not in play', function() {
                 beforeEach(function() {
-                    player.cardsInPlay.push(cardWithNoAttachments);
+                    this.findSpy.and.returnValue(undefined);
 
-                    dropSucceeded = player.drop(cardNotInHand, 'play area', 'discard pile');
+                    this.dropSucceeded = this.player.drop(this.cardSpy, 'play area', 'discard pile');
                 });
 
                 it('should return false and not update the game state', function() {
-                    expect(dropSucceeded).toBe(false);
-                    expect(player.cardsInPlay.length).toBe(1);
-                    expect(player.discardPile.length).toBe(0);
+                    expect(this.dropSucceeded).toBe(false);
+                    expect(this.player.cardsInPlay.size()).toBe(1);
+                    expect(this.player.discardCard).not.toHaveBeenCalled();
                 });
             });
 
             describe('when the card is in play', function() {
                 beforeEach(function() {
-                    player.cardsInPlay.push(cardWithNoAttachments);
-
-                    dropSucceeded = player.drop(cardWithNoAttachments.card, 'play area', 'discard pile');
+                    this.dropSucceeded = this.player.drop(this.cardSpy, 'play area', 'discard pile');
                 });
 
                 it('should return true and put the card in the discard pile', function() {
-                    expect(dropSucceeded).toBe(true);
-                    expect(player.cardsInPlay.length).toBe(0);
-                    expect(player.discardPile.length).toBe(1);
-                });
-            });
-
-            describe('when the card is in play and has a dupe', function() {
-                beforeEach(function() {
-                    cardWithNoAttachments.dupes.push(dupe.card);
-
-                    player.cardsInPlay.push(cardWithNoAttachments);
-
-                    dropSucceeded = player.drop(cardWithNoAttachments.card, 'play area', 'discard pile');
-                });
-
-                it('should return true and put the card and dupe in the discard pile', function() {
-                    expect(dropSucceeded).toBe(true);
-                    expect(player.cardsInPlay.length).toBe(0);
-                    expect(player.discardPile.length).toBe(2);
-                    expect(player.discardPile[0]).toBe(dupe.card);
-                    expect(player.discardPile[1]).toBe(cardWithNoAttachments.card);
-                });
-            });
-
-            describe('when the card is in play and has a non terminal attachment belonging to this player', function() {
-                beforeEach(function() {
-                    player.cardsInPlay.push(cardWithAttachment);
-
-                    dropSucceeded = player.drop(cardWithAttachment.card, 'play area', 'discard pile');
-                });
-
-                it('should return true and put the card in the discard pile', function() {
-                    expect(dropSucceeded).toBe(true);
-                    expect(player.cardsInPlay.length).toBe(0);
-                    expect(player.discardPile.length).toBe(1);
-                });
-
-                it('should return the attachment to the player\'s hand', function() {
-                    expect(player.hand.length).toBe(1);
-                });
-            });
-
-            describe('when the card is in play and has a terminal attachment belonging to this player', function() {
-                beforeEach(function() {
-                    cardWithAttachment.attachments = [attachmentInHand];
-                    player.cardsInPlay.push(cardWithAttachment);
-
-                    dropSucceeded = player.drop(cardWithAttachment.card, 'play area', 'discard pile');
-                });
-
-                it('should return true and put the card in the discard pile', function() {
-                    expect(dropSucceeded).toBe(true);
-                    expect(player.cardsInPlay.length).toBe(0);
-                    expect(player.discardPile.length).toBe(2);
-                });
-
-                it('should put the attachment in the player\'s hand', function() {
-                    expect(player.discardPile[0]).toBe(attachmentInHand);
-                });
-            });
-
-            describe('when the card is in play and has a non terminal attachment belonging to the other player', function() {
-                beforeEach(function() {
-                    cardWithAttachment.attachments = [otherPlayerNonTerminalAttachment.card];
-                    player.cardsInPlay.push(cardWithAttachment);
-
-                    dropSucceeded = player.drop(cardWithAttachment.card, 'play area', 'discard pile');
-                });
-
-                it('should return true and put the card in the discard pile', function() {
-                    expect(dropSucceeded).toBe(true);
-                    expect(player.cardsInPlay.length).toBe(0);
-                    expect(player.discardPile.length).toBe(1);
-                });
-
-                it('should return the attachment to the other player\'s hand', function() {
-                    expect(otherPlayer.hand.length).toBe(1);
-                });
-            });
-
-            describe('when the card is in play and has a terminal attachment belonging to the other player', function() {
-                beforeEach(function() {
-                    cardWithAttachment.attachments = [otherPlayerTerminalAttachment.card];
-                    player.cardsInPlay.push(cardWithAttachment);
-
-                    dropSucceeded = player.drop(cardWithAttachment.card, 'play area', 'discard pile');
-                });
-
-                it('should return true and put the card in the discard pile', function() {
-                    expect(dropSucceeded).toBe(true);
-                    expect(player.cardsInPlay.length).toBe(0);
-                    expect(player.discardPile.length).toBe(1);
-                });
-
-                it('should put the attachment in the other player\'s discard', function() {
-                    expect(otherPlayer.discardPile.length).toBe(1);
-                    expect(otherPlayer.discardPile[0]).toBe(otherPlayerTerminalAttachment.card);
-                });
-            });
-
-            describe('when the card is in play and is attached to another card', function() {
-                beforeEach(function() {
-                    cardWithAttachment.attachments = [attachment.card];
-                    attachment.card.parent = cardWithAttachment;
-                    player.cardsInPlay.push(cardWithAttachment);
-
-                    dropSucceeded = player.drop(attachment.card, 'play area', 'discard pile');
-                });
-
-                it('should return true and put the attachment in the discard pile', function() {
-                    expect(dropSucceeded).toBe(true);
-                    expect(player.discardPile.length).toBe(1);
-                    expect(player.discardPile[0]).toBe(attachment.card);
-                });
-
-                it('should leave the parent card in play', function() {
-                    expect(player.cardsInPlay.length).toBe(1);
-                });
-
-                it('should remove the attachment from the parent', function() {
-                    expect(cardWithAttachment.attachments.length).toBe(0);
+                    expect(this.dropSucceeded).toBe(true);
+                    expect(this.player.cardsInPlay.size()).toBe(0);
+                    expect(this.player.discardCard).toHaveBeenCalled();
                 });
             });
         });
