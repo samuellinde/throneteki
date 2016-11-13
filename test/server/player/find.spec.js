@@ -22,7 +22,7 @@ describe('the Player', () => {
         describe('when called for a card that isn\'t in play', () => {
             it('should return undefined', () => {
                 card = player.findCardInPlayByUuid('notinplay');
-                
+
                 expect(card).toBe(undefined);
             });
         });
