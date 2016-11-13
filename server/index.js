@@ -238,7 +238,7 @@ function sendGameState(game) {
 
 function handleError(game, e) {
     logger.error(e);
-    // logger.error(game);
+    //logger.error(game);
     // _.each(game.players, player => {
     //     logger.error(player);
     // });
