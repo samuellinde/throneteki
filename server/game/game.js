@@ -250,16 +250,11 @@ class Game extends EventEmitter {
         }
     }
 
-    selectPlot(playerId, plot) {
+    selectPlot(playerId, plotId) {
         var player = this.getPlayerById(playerId);
 
-        if(!player || !player.selectPlot(plot)) {
+        if(!player || !player.selectPlot(plotId)) {
             return;
-        }
-
-        var plotImplementation = cards[player.selectedPlot.code];
-        if(plotImplementation && plotImplementation.register) {
-            plotImplementation.register(this, player);
         }
 
         this.addMessage(player.name + ' has selected a plot');

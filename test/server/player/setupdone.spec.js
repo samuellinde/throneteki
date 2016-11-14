@@ -93,8 +93,8 @@ describe('Player', function() {
 
             describe('and a duplicate is found', function() {
                 beforeEach(function() {
-                    this.findSpy.and.callFake((list, card) => {
-                        if(card.name === 'Dupe') {
+                    this.findSpy.and.callFake((list, name) => {
+                        if(name === 'Dupe') {
                             return this.cardSpy;
                         }
 

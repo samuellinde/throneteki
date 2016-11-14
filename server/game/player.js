@@ -3,7 +3,8 @@ const uuid = require('node-uuid');
 
 const Spectator = require('./spectator.js');
 const cards = require('./cards');
-const Card = require('./card.js');
+const DrawCard = require('./drawcard.js');
+const PlotCard = require('./plotcard.js');
 
 const StartingHandSize = 7;
 
@@ -247,7 +248,7 @@ class Player extends Spectator {
                 return;
             }
 
-            var duplicate = this.findCardByName(processedCards, card);
+            var duplicate = this.findCardByName(processedCards, card.name);
             
             if(duplicate) {
                 duplicate.addDuplicate(card);
@@ -301,14 +302,15 @@ class Player extends Spectator {
         };
     }
 
-    selectPlot(plot) {
-        if(!this.plotDeck.any(card => {
-            return card.uuid === plot.uuid;
-        })) {
+    selectPlot(plotId) {
+        var plot = this.findCardByUuid(this.plotDeck, plotId);
+
+        if(!plot) {
             return false;
         }
 
-        this.selectedPlot = { facedown: true, card: plot };
+        plot.facedown = true;        
+        this.selectedPlot = plot;
 
         return true;
     }
@@ -319,13 +321,13 @@ class Player extends Spectator {
 
         this.selectedPlot.facedown = false;
         if(this.activePlot) {
-            this.plotDiscard.push(this.activePlot.card);
+            this.plotDiscard.push(this.activePlot);
         }
 
         this.activePlot = this.selectedPlot;
         this.plotDeck = this.removeCardByUuid(this.plotDeck, this.selectedPlot.uuid);
 
-        if(this.plotDeck.empty() === 0) {
+        if(this.plotDeck.isEmpty()) {
             this.plotDeck = this.plotDiscard;
             this.plotDiscard = _([]);
         }
@@ -732,7 +734,7 @@ class Player extends Spectator {
             return;
         }
 
-        _.each(card.dupes, dupe => {
+        card.dupes.each(dupe => {
             pile.push(dupe);
         });
 
@@ -839,25 +841,30 @@ class Player extends Spectator {
         this.drawCards = _([]);
         this.plotCards = _([]);
 
-        deck.drawCards.each(cardEntry => {
+        _.each(deck.drawCards, cardEntry => {
             for(var i = 0; i < cardEntry.count; i++) {
                 var drawCard = undefined;
 
-                if(cards[cardEntry.code]) {
+                if(cards[cardEntry.card.code]) {
                     drawCard = new cards[cardEntry.code](this, cardEntry);
                 } else {
-                    drawCard = new Card(this, cardEntry.card);
+                    drawCard = new DrawCard(this, cardEntry.card);
                 }
 
                 this.drawCards.push(drawCard);
             }
         });
 
-        deck.plotCards.each(card => {
-            for(var i = 0; i < card.count; i++) {
-                var plotCard = _.clone(card.card);
-                plotCard.uuid = uuid.v1();
-                plotCard.owner = this.id;
+        _.each(deck.plotCards, cardEntry => {
+            for(var i = 0; i < cardEntry.count; i++) {
+                var plotCard = undefined;
+
+                if(cards[cardEntry.card.code]) {
+                    plotCard = new cards[cardEntry.code](this, cardEntry.card);
+                } else {
+                    plotCard = new PlotCard(this, cardEntry.card);
+                }
+                
                 this.plotCards.push(plotCard);
             }
         });
@@ -868,13 +875,11 @@ class Player extends Spectator {
     getTotalPlotStat(property) {
         var baseValue = 0;
 
-        if(this.activePlot && property(this.activePlot.card)) {
-            baseValue = property(this.activePlot.card);
+        if(this.activePlot && property(this.activePlot)) {
+            baseValue = property(this.activePlot);
         }
 
-        var modifier = _.chain(this.cardsInPlay).map(cip => {
-            return [cip.card].concat(cip.attachments);
-        }).flatten(true).reduce((memo, card) => {
+        var modifier = this.cardsInPlay.reduce((memo, card) => {
             return memo + (property(card) || 0);
         }, 0);
 
@@ -883,19 +888,19 @@ class Player extends Spectator {
 
     getTotalInitiative() {
         return this.getTotalPlotStat(card => {
-            return card.initiative;
+            return card.getInitiative();
         });
     }
 
     getTotalIncome() {
         return this.getTotalPlotStat(card => {
-            return card.income;
+            return card.getIncome();
         });
     }
 
     getTotalReserve() {
         return this.getTotalPlotStat(card => {
-            return card.reserve;
+            return card.getReserve();
         });
     }
 
@@ -919,7 +924,9 @@ class Player extends Spectator {
             cardsInPlay: this.cardsInPlay.map(card => {
                 return card.getSummary(true);
             }),
-            plotDeck: isActivePlayer ? this.plotDeck : undefined,
+            plotDeck: isActivePlayer ? this.plotDeck.map(card => {
+                return card.getSummary(isActivePlayer);
+            }) : undefined,
             numPlotCards: this.plotDeck.size(),
             plotSelected: !!this.selectedPlot,
             activePlot: this.activePlot,

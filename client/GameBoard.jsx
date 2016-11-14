@@ -278,7 +278,7 @@ export class InnerGameBoard extends React.Component {
                 return;
             }
 
-            commandArg = this.state.selectedPlot;
+            commandArg = this.state.selectedPlot.uuid;
         }
 
         this.props.socket.emit(command, commandArg);

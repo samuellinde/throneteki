@@ -1,14 +1,14 @@
 /*global describe, it, beforeEach, expect*/
 /*eslint camelcase: 0, no-invalid-this: 0 */
 
-const Card = require('../../../server/game/card.js');
+const BaseCard = require('../../../server/game/basecard.js');
 
 describe('Card', function () {
     beforeEach(function () {
         this.testCard = { code: '111', label: 'test 1(some pack)', name: 'test 1' };
         this.limitedCard = { code: '1234', text: 'Limited.' };
         this.nonLimitedCard = { code: '2222', text: 'Stealth.' };
-        this.card = new Card({}, this.testCard);
+        this.card = new BaseCard({}, this.testCard);
     });
 
     describe('when new instance created', function() {
@@ -85,42 +85,6 @@ describe('Card', function () {
                 it('should return facedown', function() {
                     expect(this.summary.facedown).toBe(true);
                 });
-            });
-        });
-
-    });
-
-    describe('isLimited', function () {
-        describe('when a card has the limited keyword', function() {
-            beforeEach(function () {
-                this.card = new Card({}, this.limitedCard);
-
-                this.isLimited = this.card.isLimited();
-            });
-
-            it('should return true', function() {
-                expect(this.isLimited).toBe(true);
-            });
-        });
-
-        describe('when a card has no text', function() {
-            beforeEach(function () {
-                this.isLimited = this.card.isLimited();
-            });
-
-            it('should return false', function () {
-                expect(this.isLimited).toBe(false);
-            });
-        });
-
-        describe('when a card does not have the limited keyword', function () {
-            beforeEach(function () {
-                this.card = new Card({}, this.nonLimitedCard);
-                this.isLimited = this.card.isLimited();
-            });
-
-            it('should return false', function () {
-                expect(this.isLimited).toBe(false);
             });
         });
     });

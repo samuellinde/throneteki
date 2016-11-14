@@ -1,6 +1,6 @@
 const uuid = require('node-uuid');
 
-class Card {
+class BaseCard {
     constructor(owner, cardData) {
         this.owner = owner;
         this.cardData = cardData;
@@ -8,6 +8,7 @@ class Card {
         this.uuid = uuid.v1();
         this.code = cardData.code;
         this.name = cardData.name;
+        this.facedown = false;
     }
 
     hasKeyword(keyword) {
@@ -18,16 +19,20 @@ class Card {
         return this.cardData.text.toLowerCase().indexOf(keyword.toLowerCase() + '.') !== -1;
     }
 
+    getInitiative() {
+        return 0;
+    }
+
+    getIncome() {
+        return 0;
+    }
+
+    getReserve() {
+        return 0;
+    }
+
     isUnique() {
         return this.cardData.is_unique;
-    }
-
-    isLimited() {
-        return this.hasKeyword('Limited');
-    }
-
-    getCost() {
-        return this.cardData.cost;
     }
 
     getType() {
@@ -45,4 +50,4 @@ class Card {
     }
 }
 
-module.exports = Card;
+module.exports = BaseCard;
