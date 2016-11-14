@@ -130,6 +130,12 @@ class Player extends Spectator {
         });
     }
 
+    isCardNameInList(list, card) {
+        return list.any(c => {
+            return c.name === card.name;
+        });
+    }
+
     canPlayCard(card) {
         if(this.phase !== 'setup' && this.phase !== 'marshal') {
             return false;
@@ -155,9 +161,7 @@ class Player extends Spectator {
         }
 
         if(card.getType() === 'character' && card.isUnique()) {
-            if(this.deadPile.any(c => {
-                return c.code === card.code;
-            })) {
+            if(this.isCardNameInList(this.deadPile, card)) {
                 return false;
             }
         }

@@ -9,12 +9,13 @@ fdescribe('Player', function () {
             this.player = new Player('1', 'Test 1', true, this.gameSpy);
 
             this.gameSpy = jasmine.createSpyObj('game', ['drop']);
-            this.cardSpy = jasmine.createSpyObj('card', ['getType', 'getCost', 'isLimited']);
+            this.cardSpy = jasmine.createSpyObj('card', ['getType', 'getCost', 'isLimited', 'isUnique']);
             this.isCardUuidInListSpy = spyOn(this.player, 'isCardUuidInList');
-            //this.isCardCodeInListSpy = spyOn(this.player, 'isCardUuidInList');
+            this.isCardNameInListSpy = spyOn(this.player, 'isCardNameInList');
             this.dupeSpy = spyOn(this.player, 'getDuplicateInPlay');
 
             this.isCardUuidInListSpy.and.returnValue(true);
+            this.isCardNameInListSpy.and.returnValue(false);
             this.dupeSpy.and.returnValue(undefined);
 
             this.player.initialise();
@@ -109,8 +110,58 @@ fdescribe('Player', function () {
         });
 
         describe('when a card is not a character', function() {
-            it('should not check the dead pile', function() {
+            beforeEach(function() {
+                this.canPlay = this.player.canPlayCard(this.cardSpy);
+            });
 
+            it('should return true', function() {
+                expect(this.canPlay).toBe(true);
+            });
+
+            it('should not check the dead pile', function() {
+                expect(this.isCardNameInListSpy).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('when a card is a character', function() {
+            beforeEach(function() {
+                this.cardSpy.getType.and.returnValue('character');
+
+                this.canPlay = this.player.canPlayCard(this.cardSpy);
+            });
+
+            describe('that is not unique', function() {
+                it('should return true', function() {
+                    expect(this.canPlay).toBe(true);
+                });
+
+                it('should not check the dead pile', function() {
+                    expect(this.isCardNameInListSpy).not.toHaveBeenCalled();
+                });
+            });
+
+            describe('that is unique', function() {
+                beforeEach(function() {
+                    this.cardSpy.isUnique.and.returnValue(true);
+                });
+
+                describe('and is in the dead pile', function() {
+                    beforeEach(function() {
+                        this.isCardNameInListSpy.and.returnValue(true);
+
+                        this.canPlay = this.player.canPlayCard(this.cardSpy);
+                    });
+
+                    it('should return false', function() {
+                        expect(this.canPlay).toBe(false);
+                    });
+                });
+
+                describe('and is not in the dead pile', function() {
+                    it('should return true', function() {
+                        expect(this.canPlay).toBe(true);
+                    });
+                });
             });
         });
     });
