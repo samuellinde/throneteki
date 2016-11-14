@@ -196,7 +196,7 @@ class Game extends EventEmitter {
             });
         } else {
             _.each(this.getPlayers(), p => {
-                p.postSetup();
+                p.setupDone();
                 p.startPlotPhase();
             });
         }
@@ -209,7 +209,7 @@ class Game extends EventEmitter {
             return;
         }
 
-        player.setupDone();
+        player.setup = true;
 
         this.addMessage(player.name + ' has finished setup');
 

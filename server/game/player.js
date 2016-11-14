@@ -5,6 +5,8 @@ const Spectator = require('./spectator.js');
 const cards = require('./cards');
 const Card = require('./card.js');
 
+const StartingHandSize = 7;
+
 class Player extends Spectator {
     constructor(id, name, owner, game) {
         super(id, name);
@@ -54,7 +56,7 @@ class Player extends Spectator {
         this.drawDeck = this.drawCards;
         this.shuffleDrawDeck();
         this.hand = _([]);
-        this.drawCardsToHand(7);
+        this.drawCardsToHand(StartingHandSize);
     }
 
     initPlotDeck() {
@@ -231,29 +233,30 @@ class Player extends Spectator {
     }
 
     setupDone() {
-        this.setup = true;
-    }
+        if(this.hand.size() < StartingHandSize) {
+            this.drawCardsToHand(StartingHandSize - this.hand.size());
+        }      
 
-    postSetup() {
-        this.drawCardsToHand(7 - this.hand.size());
-
-        var processedCards = [];
+        var processedCards = _([]);
 
         this.cardsInPlay.each(card => {
             card.facedown = false;
 
-            var dupe = _.find(processedCards, c => {
-                return c.isUnique() && c.code === card.code;
-            });
-
-            if(dupe) {
-                dupe.dupes.push(card);
-            } else {
+            if(!card.isUnique()) {
                 processedCards.push(card);
+                return;
+            }
+
+            var duplicate = this.findCardByName(processedCards, card);
+            
+            if(duplicate) {
+                duplicate.addDuplicate(card);
+            } else {
+                processedCards.push(card);                
             }
         });
 
-        this.cardsInPlay = _(processedCards);
+        this.cardsInPlay = processedCards;
     }
 
     marshalDone() {
@@ -797,6 +800,12 @@ class Player extends Spectator {
         }));
     }
 
+    findCardByName(list, name) {
+        return list.find(card => {
+            return card.name === name;
+        });
+    }
+
     findCardByUuid(list, uuid) {
         var returnedCard = undefined;
 
@@ -830,7 +839,7 @@ class Player extends Spectator {
         this.drawCards = _([]);
         this.plotCards = _([]);
 
-        _.each(deck.drawCards, cardEntry => {
+        deck.drawCards.each(cardEntry => {
             for(var i = 0; i < cardEntry.count; i++) {
                 var drawCard = undefined;
 
@@ -844,7 +853,7 @@ class Player extends Spectator {
             }
         });
 
-        _.each(deck.plotCards, card => {
+        deck.plotCards.each(card => {
             for(var i = 0; i < card.count; i++) {
                 var plotCard = _.clone(card.card);
                 plotCard.uuid = uuid.v1();

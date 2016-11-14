@@ -3,7 +3,7 @@
 
 const Player = require('../../../server/game/player.js');
 
-fdescribe('Player', function () {
+describe('Player', function () {
     describe('canPlayCard()', function () {
         beforeEach(function () {
             this.player = new Player('1', 'Test 1', true, this.gameSpy);

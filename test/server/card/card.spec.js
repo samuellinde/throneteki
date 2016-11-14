@@ -3,7 +3,7 @@
 
 const Card = require('../../../server/game/card.js');
 
-fdescribe('Card', function () {
+describe('Card', function () {
     beforeEach(function () {
         this.testCard = { code: '111', label: 'test 1(some pack)', name: 'test 1' };
         this.limitedCard = { code: '1234', text: 'Limited.' };
