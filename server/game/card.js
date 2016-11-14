@@ -10,8 +10,20 @@ class Card {
         this.name = cardData.name;
     }
 
+    hasKeyword(keyword) {
+        if(!this.cardData.text) {
+            return false;
+        }
+
+        return this.cardData.text.toLowerCase().indexOf(keyword.toLowerCase() + '.') !== -1;
+    }
+
     isUnique() {
         return this.cardData.is_unique;
+    }
+
+    isLimited() {
+        return this.hasKeyword('Limited');
     }
 
     getCost() {

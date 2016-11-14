@@ -124,7 +124,7 @@ class Player extends Spectator {
         this.menuTitle = 'Waiting for opponent to keep hand or mulligan';
     }
 
-    isCardInList(list, card) {
+    isCardUuidInList(list, card) {
         return list.any(c => {
             return c.uuid === card.uuid;
         });
@@ -135,25 +135,26 @@ class Player extends Spectator {
             return false;
         }
 
-        if(!this.isCardInList(this.hand, card)) {
+        if(!this.isCardUuidInList(this.hand, card)) {
             return false;
         }
 
-        var isDupe = this.getDuplicateInPlay(card);
+        var dupe = this.getDuplicateInPlay(card);
 
-        if(card.getCost() > this.gold && !isDupe) {
+        if(card.getCost() > this.gold && !dupe) {
             return false;
         }
 
-        if(this.limitedPlayed && this.hasKeyword(card, 'Limited') && !isDupe) {
+        if(this.limitedPlayed && card.isLimited() && !dupe) {
             return false;
         }
 
+        // XXX this can come out soon, but not yet
         if(card.getType() === 'event') {
             return false;
         }
 
-        if(card.getType() === 'character' && card.isUnique) {
+        if(card.getType() === 'character' && card.isUnique()) {
             if(this.deadPile.any(c => {
                 return c.code === card.code;
             })) {
