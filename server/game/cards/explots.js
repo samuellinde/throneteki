@@ -2,32 +2,6 @@
 //     return card.traits.indexOf(trait + '.') !== -1;
 // }
 
-// // 01003 - A Game Of Thrones
-// class AGameOfThrones {
-//     constructor(player) {
-//         this.player = player;
-//         this.beforeChallenge = this.beforeChallenge.bind(this);
-//     }
-
-//     beforeChallenge(game, player, challengeType) {
-//         if((challengeType === 'power' || challengeType === 'military') && player.challenges['intrigue'].won <= 0) {
-//             game.cancelChallenge = true;
-//         }
-//     }
-// }
-// plots['01003'] = {
-//     register(game, player) {
-//         var plot = new AGameOfThrones(player);
-
-//         game.playerPlots[player.id] = plot;
-
-//         game.on('beforeChallenge', plot.beforeChallenge);
-//     },
-//     unregister(game, player) {
-//         game.removeListener('beforeChallenge', game.playerPlots[player.id].beforeChallenge);
-//     }
-// };
-
 // // 01004 - A Noble Cause
 // class ANobleCause {
 //     constructor(player) {

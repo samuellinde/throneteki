@@ -4,13 +4,7 @@ class AFeastForCrows extends PlotCard {
     constructor(owner, cardData) {
         super(owner, cardData);
 
-        this.afterDominance = this.afterDominance.bind(this);
-    }
-
-    revealed() {
-        super.revealed();
-
-        this.game.on('afterDominance', this.afterDominance);
+        this.registerEvents(['afterDominance']);
     }
 
     afterDominance(winner) {
@@ -20,12 +14,6 @@ class AFeastForCrows extends PlotCard {
 
         this.game.addMessage(winner.name + ' uses ' + this.name + ' to gain 2 power');
         this.game.addPower(winner, 2);
-    }
-
-    leavesPlay() {
-        super.leavesPlay();
-
-        this.game.removeListener('afterDominance', this.afterDominance);
     }
 }
 

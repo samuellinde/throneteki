@@ -1,6 +1,20 @@
+const _ = require('underscore');
+
 const BaseCard = require('./basecard.js');
 
 class PlotCard extends BaseCard {
+    registerEvents(events) {
+        this.events = [];
+
+        _.each(events, event => {
+            this[event] = this[event].bind(this);
+
+            this.game.on(event, this[event]);
+
+            this.events.push(event);
+        });
+    }
+
     getInitiative() {
         return this.cardData.initiative;
     }
@@ -19,6 +33,12 @@ class PlotCard extends BaseCard {
 
     revealed() {
         this.inPlay = true;
+    }
+
+    leavesPlay() {
+        _.each(this.events, event => {
+            this.game.removeListener(event, this[event]);
+        });
     }
 }
 

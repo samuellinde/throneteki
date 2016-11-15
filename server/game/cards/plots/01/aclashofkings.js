@@ -4,13 +4,7 @@ class AClashOfKings extends PlotCard {
     constructor(owner, cardData) {
         super(owner, cardData);
 
-        this.afterChallenge = this.afterChallenge.bind(this);
-    }
-
-    revealed() {
-        super.revealed();
-
-        this.game.on('afterChallenge', this.afterChallenge);
+        this.registerEvents(['afterChallenge']);
     }
 
     afterChallenge(challengeType, winner, loser) {
@@ -22,12 +16,6 @@ class AClashOfKings extends PlotCard {
             this.game.addMessage(winner.name + ' uses ' + this.name + ' to move 1 power from ' + loser.name + '\'s faction card');
             this.game.transferPower(winner, loser, 1);
         }
-    }
-
-    leavesPlay() {
-        super.leavesPlay();
-
-        this.game.removeListener('afterChallenge', this.afterChallenge);
     }
 }
 
