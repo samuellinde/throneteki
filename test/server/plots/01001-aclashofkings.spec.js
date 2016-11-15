@@ -26,7 +26,7 @@ describe('AClashOfKings', function() {
         });
 
         it('should register its afterChallenge handler', function() {
-            expect(this.gameSpy.on).toHaveBeenCalled();
+            expect(this.gameSpy.on).toHaveBeenCalledWith('afterChallenge', this.plot.afterChallenge);
         });
     });
 
@@ -40,7 +40,7 @@ describe('AClashOfKings', function() {
         });
 
         it('should unregister its afterChallenge handler', function() {
-            expect(this.gameSpy.removeListener).toHaveBeenCalled();
+            expect(this.gameSpy.removeListener).toHaveBeenCalledWith('afterChallenge', this.plot.afterChallenge);
         });
     });
 

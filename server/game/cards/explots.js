@@ -2,62 +2,6 @@
 //     return card.traits.indexOf(trait + '.') !== -1;
 // }
 
-// // 01001 - A Clash Of Kings
-// class AClashOfKings {
-//     constructor(player) {
-//         this.player = player;
-//         this.afterChallenge = this.afterChallenge.bind(this);
-//     }
-
-//     afterChallenge(game, challengeType, winner, loser) {
-//         if(winner === this.player && challengeType === 'power' && loser.power > 0) {
-//             game.addMessage(winner.name + ' uses ' + winner.activePlot.card.label + ' to move 1 power from ' + loser.name + '\'s faction card');
-//             game.transferPower(winner, loser, 1);
-//         }
-//     }
-// }
-// plots['01001'] = {
-//     register(game, player) {
-//         var plot = new AClashOfKings(player);
-//         game.playerPlots[player.id] = plot;
-
-//         game.on('afterChallenge', plot.afterChallenge);
-//     },
-//     unregister(game, player) {
-//         game.removeListener('afterChallenge', game.playerPlots[player.id].afterChallenge);
-//     }
-// };
-
-// // 01002 - A Feast For Crows
-// class AFeastForCrows {
-//     constructor(player) {
-//         this.player = player;
-
-//         this.afterDominance = this.afterDominance.bind(this);
-//     }
-
-//     afterDominance(game, winner) {
-//         if(winner !== this.player) {
-//             return;
-//         }
-
-//         game.addMessage(winner.name + ' uses ' + winner.activePlot.card.label + ' to gain 2 power');
-//         game.addPower(winner, 2);
-//     }
-// }
-// plots['01002'] = {
-//     register(game, player) {
-//         var plot = new AFeastForCrows(player);
-
-//         game.playerPlots[player.id] = plot;
-
-//         game.on('afterDominance', plot.afterDominance);
-//     },
-//     unregister(game, player) {
-//         game.removeListener('afterDominance', game.playerPlots[player.id].afterDominance);
-//     }
-// };
-
 // // 01003 - A Game Of Thrones
 // class AGameOfThrones {
 //     constructor(player) {

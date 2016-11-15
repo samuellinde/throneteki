@@ -4,8 +4,6 @@ class AClashOfKings extends PlotCard {
     constructor(owner, cardData) {
         super(owner, cardData);
 
-        this.owner = owner;
-
         this.afterChallenge = this.afterChallenge.bind(this);
     }
 
