@@ -540,6 +540,8 @@
 //             return;
 //         }
 
+// XXX Check empty hand
+
 //         var cardIndex = _.random(0, otherPlayer.hand.length - 1);
 //         var card = otherPlayer.hand[cardIndex];
 //         var message = player.name + ' uses ' + player.activePlot.card.label + ' to discard ' + card.label +
