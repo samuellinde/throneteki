@@ -36,7 +36,7 @@ class Player extends Spectator {
             if(limit > 0) {
                 cards = _(this.drawDeck.first(limit));
             } else {
-                cards = _(this.drawDeck.first(-limit));
+                cards = _(this.drawDeck.last(-limit));
             }
         }
 
@@ -236,7 +236,7 @@ class Player extends Spectator {
     setupDone() {
         if(this.hand.size() < StartingHandSize) {
             this.drawCardsToHand(StartingHandSize - this.hand.size());
-        }      
+        }
 
         var processedCards = _([]);
 
@@ -249,11 +249,11 @@ class Player extends Spectator {
             }
 
             var duplicate = this.findCardByName(processedCards, card.name);
-            
+
             if(duplicate) {
                 duplicate.addDuplicate(card);
             } else {
-                processedCards.push(card);                
+                processedCards.push(card);
             }
         });
 
@@ -309,7 +309,7 @@ class Player extends Spectator {
             return false;
         }
 
-        plot.facedown = true;        
+        plot.facedown = true;
         this.selectedPlot = plot;
 
         return true;
@@ -864,7 +864,7 @@ class Player extends Spectator {
                 } else {
                     plotCard = new PlotCard(this, cardEntry.card);
                 }
-                
+
                 this.plotCards.push(plotCard);
             }
         });

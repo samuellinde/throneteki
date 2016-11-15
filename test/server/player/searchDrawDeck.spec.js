@@ -4,7 +4,7 @@
 const _ = require('underscore');
 const Player = require('../../../server/game/player.js');
 
-xdescribe('the Player', () => {
+describe('the Player', () => {
     var player = new Player('1', 'Player 1', true);
     var drawDeck = _([
       { name: 'foo' },
