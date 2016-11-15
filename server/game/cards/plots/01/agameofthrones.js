@@ -1,8 +1,8 @@
 const PlotCard = require('../../../plotcard.js');
 
-class AGameOfThrones extends PlotCard {
+class AGameOfThrones extends PlotCard { 
     canChallenge(player, challengeType) {
-        if((challengeType === 'power' || challengeType === 'military') && player.challenges['intrigue'].won <= 0) {
+        if(this.inPlay && (challengeType === 'power' || challengeType === 'military') && player.getNumberOfChallengesWon('intrigue') <= 0) {
             return false;
         }
 

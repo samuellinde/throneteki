@@ -114,6 +114,10 @@ class Player extends Spectator {
         });
     }
 
+    getNumberOfChallengesWon(challengeType) {
+        return this.challenges[challengeType].won;
+    }
+
     drawCardsToHand(numCards) {
         this.hand = _(this.hand.concat(this.drawDeck.first(numCards)));
         this.drawDeck = _(this.drawDeck.rest(numCards));
