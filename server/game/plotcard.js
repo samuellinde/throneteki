@@ -12,6 +12,10 @@ class PlotCard extends BaseCard {
     getReserve() {
         return this.cardData.reserve;
     }
+
+    revealed() {
+        this.inPlay = true;
+    }
 }
 
 module.exports = PlotCard;

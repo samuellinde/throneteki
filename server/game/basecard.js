@@ -3,12 +3,14 @@ const uuid = require('node-uuid');
 class BaseCard {
     constructor(owner, cardData) {
         this.owner = owner;
+        this.game = this.owner.game;
         this.cardData = cardData;
 
         this.uuid = uuid.v1();
         this.code = cardData.code;
         this.name = cardData.name;
         this.facedown = false;
+        this.inPlay = false;
     }
 
     hasKeyword(keyword) {
@@ -17,6 +19,10 @@ class BaseCard {
         }
 
         return this.cardData.text.toLowerCase().indexOf(keyword.toLowerCase() + '.') !== -1;
+    }
+
+    leavesPlay() {
+        this.inPlay = false;
     }
 
     getInitiative() {

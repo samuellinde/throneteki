@@ -13,7 +13,7 @@ describe('Player', function() {
         beforeEach(function() {
             this.findSpy = spyOn(this.player, 'findCardByUuid');
             this.canPlaySpy = spyOn(this.player, 'canPlayCard');
-            this.cardSpy = jasmine.createSpyObj('card', ['getType', 'getCost', 'isUnique']);
+            this.cardSpy = jasmine.createSpyObj('card', ['getType', 'getCost', 'isUnique', 'isLimited']);
             this.dupeCardSpy = jasmine.createSpyObj('dupecard', ['addDuplicate']);
             spyOn(this.player, 'removeFromHand');
 
@@ -134,6 +134,28 @@ describe('Player', function() {
                 it('should not add a new card to play', function() {
                     expect(this.player.cardsInPlay).not.toContain(this.cardSpy);
                 });
+            });
+        });
+
+        describe('when card is limited and not forcing play', function() {
+            beforeEach(function() {
+                this.cardSpy.isLimited.and.returnValue(true);
+                this.canPlay = this.player.playCard(this.cardSpy);
+            });
+
+            it('should set the limited played flag', function() {
+                expect(this.player.limitedPlayed).toBe(true);
+            });
+        });
+
+        describe('when card is limited and forcing play', function() {
+            beforeEach(function() {
+                this.cardSpy.isLimited.and.returnValue(true);
+                this.canPlay = this.player.playCard(this.cardSpy, true);
+            });
+
+            it('should not set the limited played flag', function() {
+                expect(this.player.limitedPlayed).toBe(false);
             });
         });
     });

@@ -8,6 +8,8 @@ class DrawCard extends BaseCard {
 
         this.dupes = _([]);
         this.attachments = _([]);
+
+        this.power = 0;
     }
 
     addDuplicate(card) {

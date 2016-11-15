@@ -9,14 +9,14 @@ function getDirectories(srcpath) {
 }
 
 module.exports = {
-    loadCards: function(path) {
+    loadCards: function(basePath, directory) {
         var cards = {};
 
-        _.each(getDirectories(path), directory => {
-            var normalisedPath = path.join(__dirname, directory);
+        _.each(getDirectories(directory), dir => {
+            var normalisedPath = path.join(directory, dir);
 
             _.each(fs.readdirSync(normalisedPath), file => {
-                var plot = require('./' + directory + '/' + file);
+                var plot = require('./cards/' + basePath + '/' + dir + '/' + file);
 
                 cards[plot.code] = plot;
             });
