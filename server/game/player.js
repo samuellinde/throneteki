@@ -737,9 +737,13 @@ class Player extends Spectator {
             return undefined;
         }
 
-        if(!character.dupes.empty() > 0) {
+        if(!character.dupes.empty()) {
+            var discardedDupe = _.first(character.dupes);
+
             character.dupes = character.dupes.slice(1);
             character = undefined;
+
+            this.discardPile.push(discardedDupe);
         } else {
             this.cardsInPlay = this.removeCardByUuid(this.cardsInPlay, card.uuid);
 
