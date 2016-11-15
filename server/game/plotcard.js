@@ -13,6 +13,10 @@ class PlotCard extends BaseCard {
         return this.cardData.reserve;
     }
 
+    canChallenge() {
+        return true;
+    }
+
     revealed() {
         this.inPlay = true;
     }
